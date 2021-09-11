@@ -58,10 +58,6 @@ output_json ={
 json_object = json.dumps(output_json, indent = 4) 
 print(json_object)
 
-#exemple:
-# print(expense)
-# print(expense.amnt)
-
 """
 The Optimized function returns optimised expense level, time_until_purchase and purchase price
 as well as the gap with the user input.
@@ -75,8 +71,9 @@ opt = Optimized(book.inc_acc(0),book.exp_acc(0),start_capital,price,time_until_p
 
 gap_list = [opt._expense_gap_pct(),opt._time_until_purchase_gap_pct(),opt._purchase_gap_pct()]
 gap_list = sorted(gap_list)
-#exemple
 print(gap_list)
+
+##TODO have json output for optimised including new values ordered by pct change?
 
 
 

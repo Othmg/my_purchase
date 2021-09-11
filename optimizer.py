@@ -1,4 +1,6 @@
+from bookings import Bookings
 from accounts import RevAcc, ExpAcc,InvAcc
+import json
 
 class Optimized:
     """
@@ -7,11 +9,12 @@ class Optimized:
     - gap with user input (as opt - user)
     - gap in pct (optimal / user_input)
     """
-    def __init__(self,revenue:RevAcc, expense:ExpAcc, start_capital:float, purchase:float,time_until_purchase:float):
+    def __init__(self,revenue:RevAcc, expense:ExpAcc, start_capital:float, purchase:float,loan:float,time_until_purchase:float):
         self.revenue = revenue.amnt
         self.expense = expense.amnt
         self.start_capital = start_capital
-        self.purchase = purchase
+        #purchase is the actual cash outflow (price - loan)
+        self.purchase = purchase - loan
         self.time_until_purchase = time_until_purchase
     
     def _expense(self)->float:
@@ -47,6 +50,34 @@ class Optimized:
     def _purchase_gap_pct(self):
         return self._purchase_gap() / self.purchase
 
+    def sorted_dict(self):
+        """
+        returns a dict of expense gap, time_until_purchase gap and price gap sorted on their gap in pct.
+        time is set 0 per default
+        """
+        self.time = 0
+        pct_gap_dict = {'expense gap':self._expense_gap_pct(),'time_until_purchase gap':self._time_until_purchase_gap_pct(),'price gap':self._purchase_gap_pct()}
+        sorted_gap_pct = dict(sorted(pct_gap_dict.items(), key=lambda item: item[1]))
+        val_gap_dict = {'expense gap':self._expense_gap(),'time_until_purchase gap':self._time_until_purchase_gap(),'price gap':self._purchase_gap()}
+        k1,k2,k3 = sorted_gap_pct.keys()
+        sorted_gap_val_dict = {
+            k1:val_gap_dict[k1],
+            k2:val_gap_dict[k2],
+            k3:val_gap_dict[k3]}
+        return sorted_gap_val_dict
+
+    def sorted_dict_json(self):
+        sort_dict = self.sorted_dict()
+        k1,k2,k3 = sort_dict.keys()
+        output_json ={ 
+        k1:sort_dict[k1],
+        k2:sort_dict[k2],
+        k3:sort_dict[k3]
+        } 
+            
+        # Serializing json  
+        json_object = json.dumps(output_json, indent = 4) 
+        return json_object
 
 
 
