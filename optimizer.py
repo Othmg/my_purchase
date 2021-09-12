@@ -1,6 +1,8 @@
 from bookings import Bookings
 from accounts import RevAcc, ExpAcc,InvAcc
 import json
+from validation import ValueValidator
+
 
 class Optimized:
     """
@@ -18,13 +20,16 @@ class Optimized:
         self.time_until_purchase = time_until_purchase
     
     def _expense(self)->float:
-        return ((self.start_capital-self.purchase)/self.time_until_purchase) + self.revenue
+        val = ((self.start_capital-self.purchase)/self.time_until_purchase) + self.revenue
+        return ValueValidator(val).validated 
 
     def _time_until_purchase(self)->float:
-        return (self.purchase-self.start_capital)/(self.revenue - self.expense)
+        val = (self.purchase-self.start_capital)/(self.revenue - self.expense)
+        return ValueValidator(val).validated 
         
     def _purchase_price(self)->float:
-        return self.start_capital + self.time_until_purchase*(self.revenue - self.expense)
+        val = self.start_capital + self.time_until_purchase*(self.revenue - self.expense)
+        return ValueValidator(val).validated 
 
     def _expense_gap(self)->float:
         opt = self._expense()
@@ -50,20 +55,37 @@ class Optimized:
     def _purchase_gap_pct(self):
         return self._purchase_gap() / self.purchase
 
-    def sorted_dict(self):
-        """
-        returns a dict of expense gap, time_until_purchase gap and price gap sorted on their gap in pct.
-        time is set 0 per default
-        """
+    def is_optimist(self)-> bool:
+        if self._expense_gap() < 0:
+            return True
+        return False
+
+    def _sorted_gap(self)-> dict:
         self.time = 0
         pct_gap_dict = {'expense gap':self._expense_gap_pct(),'time_until_purchase gap':self._time_until_purchase_gap_pct(),'price gap':self._purchase_gap_pct()}
-        sorted_gap_pct = dict(sorted(pct_gap_dict.items(), key=lambda item: item[1]))
-        val_gap_dict = {'expense gap':self._expense_gap(),'time_until_purchase gap':self._time_until_purchase_gap(),'price gap':self._purchase_gap()}
+        return dict(sorted(pct_gap_dict.items(), key=lambda item: item[1]))
+
+    def sorted_dict(self)-> dict:
+        """
+        returns a dict of expense gap, time_until_purchase gap and price gap sorted on their gap in pct.
+        sorted dict returns largest gap first when the user was pessimistic (the logic behind is that the user would happily change the largest value in his favor)
+        sorted dict returns smallest gap first when user was optimistic (the logic behing is that this is the least painful change)
+        """
+        sorted_gap_pct = self._sorted_gap()
+        gap_values_dict = {'expense gap':self._expense_gap(),'time_until_purchase gap':self._time_until_purchase_gap(),'price gap':self._purchase_gap()}
+        
         k1,k2,k3 = sorted_gap_pct.keys()
-        sorted_gap_val_dict = {
-            k1:val_gap_dict[k1],
-            k2:val_gap_dict[k2],
-            k3:val_gap_dict[k3]}
+
+        if self.is_optimist() == True:
+            sorted_gap_val_dict = {
+                k1:gap_values_dict[k1],
+                k2:gap_values_dict[k2],
+                k3:gap_values_dict[k3]}
+        else:
+            sorted_gap_val_dict = {
+                k3:gap_values_dict[k3],
+                k2:gap_values_dict[k2],
+                k1:gap_values_dict[k1]}
         return sorted_gap_val_dict
 
     def sorted_dict_json(self):
