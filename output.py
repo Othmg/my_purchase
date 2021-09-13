@@ -35,7 +35,6 @@ input_dict_2 = {
             }
 
 
-
 input_dict_3 = {
             'revenue':5000.0,
             'exp_input':3000.0,
@@ -77,10 +76,17 @@ class output:
     # Serializing json  
     return json.dumps(output_json, indent = 4) 
 
-  def ranked_json(self):
+  def ranked_gap_json(self):
     ranked_time = 0
     opt = Optimized(self.book.inc_acc(ranked_time), self.book.exp_acc(ranked_time), self.book.cash_acc(ranked_time).amnt,self.price, self.loan,self.time_until_purchase)
-    return opt.sorted_dict_json()
+    return opt.get_sorted_gap()
+
+  def ranked_val_json(self):
+    ranked_time = 0
+    opt = Optimized(self.book.inc_acc(ranked_time), self.book.exp_acc(ranked_time), self.book.cash_acc(ranked_time).amnt,self.price, self.loan,self.time_until_purchase)
+    return opt.get_sorted_val()
+
+
 
   def test_view(self):
     ranked_time = 0
@@ -94,21 +100,14 @@ class output:
     print('sorted dict',opt.sorted_dict())
     
 
-out_1 = output(input_dict_2,1)
-print(out_1.test_view())
-##TODO if stmt: if user too pessimistic, optimal values should be sorted by largest change first, if user is pessimistic then smallest change first
+out_1 = output(input_dict,1)
+print(out_1.ranked_gap_json())
 
 
 def diff_month(d1, d2):
     return (d1.year - d2.year) * 12 + d1.month - d2.month
 
 assert diff_month(datetime(2010,10,1), datetime(2010,9,1)) == 1
-
-
-
-
-
-
 
 
 
