@@ -25,7 +25,9 @@ class Optimized:
 
     def _time_until_purchase(self)->float:
         val = (self.purchase-self.start_capital)/(self.revenue - self.expense)
-        return ValueValidator(val).validated 
+        if val == -1:
+            val = 0
+        return val
         
     def _purchase_price(self)->float:
         val = self.start_capital + self.time_until_purchase*(self.revenue - self.expense)
@@ -60,21 +62,25 @@ class Optimized:
             return True
         return False
 
-    def _sorted_gap(self)-> dict:
+    def _sorted(self)-> dict:
         self.time = 0
-        pct_gap_dict = {'expense gap':self._expense_gap_pct(),'time_until_purchase gap':self._time_until_purchase_gap_pct(),'price gap':self._purchase_gap_pct()}
+        pct_gap_dict = {'expense':self._expense_gap_pct(),'time_until_purchase':self._time_until_purchase_gap_pct(),'price':self._purchase_gap_pct()}
         return dict(sorted(pct_gap_dict.items(), key=lambda item: item[1]))
 
-    def sorted_dict(self)-> dict:
+    def sorted_keys(self)-> dict:
         """
         returns a dict of expense gap, time_until_purchase gap and price gap sorted on their gap in pct.
         sorted dict returns largest gap first when the user was pessimistic (the logic behind is that the user would happily change the largest value in his favor)
         sorted dict returns smallest gap first when user was optimistic (the logic behing is that this is the least painful change)
         """
-        sorted_gap_pct = self._sorted_gap()
-        gap_values_dict = {'expense gap':self._expense_gap(),'time_until_purchase gap':self._time_until_purchase_gap(),'price gap':self._purchase_gap()}
-        
-        k1,k2,k3 = sorted_gap_pct.keys()
+        sorted = self._sorted()
+        k1,k2,k3 = sorted.keys()
+        return k1,k2,k3
+
+    def sorted_gap_dict(self)-> dict:
+
+        k1,k2,k3 = self.sorted_keys()
+        gap_values_dict = {'expense':self._expense_gap(),'time_until_purchase':self._time_until_purchase_gap(),'price':self._purchase_gap()}
 
         if self.is_optimist() == True:
             sorted_gap_val_dict = {
@@ -88,18 +94,44 @@ class Optimized:
                 k1:gap_values_dict[k1]}
         return sorted_gap_val_dict
 
-    def sorted_dict_json(self):
-        sort_dict = self.sorted_dict()
-        k1,k2,k3 = sort_dict.keys()
+    def sorted_val_dict(self)-> dict:
+
+        k1,k2,k3 = self.sorted_keys()
+        values_dict = {'expense':self._expense(),'time_until_purchase':self._time_until_purchase(),'price':self._purchase_price()}
+
+        if self.is_optimist() == True:
+            sorted_gap_val_dict = {
+                k1:values_dict[k1],
+                k2:values_dict[k2],
+                k3:values_dict[k3]}
+        else:
+            sorted_gap_val_dict = {
+                k3:values_dict[k3],
+                k2:values_dict[k2],
+                k1:values_dict[k1]}
+        return sorted_gap_val_dict
+
+
+    def sorted_json(self,sorted:dict):
+        k1,k2,k3 = sorted.keys()
         output_json ={ 
-        k1:sort_dict[k1],
-        k2:sort_dict[k2],
-        k3:sort_dict[k3]
+        k1:sorted[k1],
+        k2:sorted[k2],
+        k3:sorted[k3]
         } 
-            
         # Serializing json  
         json_object = json.dumps(output_json, indent = 4) 
         return json_object
+
+    def get_sorted_gap(self):
+        dct = self.sorted_gap_dict()
+        return self.sorted_json(dct)
+
+    def get_sorted_val(self):
+        dct = self.sorted_val_dict()
+        return self.sorted_json(dct)
+
+    
 
 
 
