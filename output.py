@@ -34,7 +34,6 @@ input_dict_2 = {
             'maintenance_rate':0.0
             }
 
-
 input_dict_3 = {
             'revenue':5000.0,
             'exp_input':3000.0,
@@ -49,13 +48,7 @@ input_dict_3 = {
 
 
 """
-All values are passed into the Bookings class which takes care of the accounting manipulation
-the methods to retrieve the dicts required a time input. 
-- income: method inc_acc
-- expense : method exp_acc
-- purchase: method inv_acc
-- capital: method cash_acc
-returns a dictionary type amount,time,category. if you need just the amount you can use .amnt
+use output class for json outputs of user inputs, ranked gap and ranked values
 """
 
 class output:
@@ -103,11 +96,10 @@ class output:
 out_1 = output(input_dict,1)
 print(out_1.ranked_gap_json())
 
-
+"""
 def diff_month(d1, d2):
     return (d1.year - d2.year) * 12 + d1.month - d2.month
 
 assert diff_month(datetime(2010,10,1), datetime(2010,9,1)) == 1
-
-
+"""
 
