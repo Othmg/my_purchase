@@ -25,7 +25,7 @@ class Optimized:
 
     def _time_until_purchase(self)->float:
         val = (self.purchase-self.start_capital)/(self.revenue - self.expense)
-        if val == -1:
+        if val < 0:
             val = 0
         return val
         
