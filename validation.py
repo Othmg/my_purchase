@@ -4,7 +4,7 @@ item_options = ['car','house', 'holiday']
 
 class Validate(ABC):
     """
-    returns boolean
+    returns boolean.
     """
     def __init__(self,input):
         self.input = input
@@ -25,8 +25,8 @@ class ValueValidator(Validate):
         super().__init__(input)
 
     def validating(self) -> bool:
-        if not isinstance(self.input, float):
-            raise TypeError('Invalid Type Entered, float type Expected')
+        if not isinstance(self.input, (int,float)):
+            raise TypeError('Invalid Type Entered, float or integer type Expected')
         elif self.input < 0:
             raise TypeError('Invalid Value Entered, positive value Expected')
         else:
