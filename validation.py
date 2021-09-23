@@ -25,7 +25,7 @@ class ValueValidator(Validate):
         super().__init__(input)
 
     def validating(self) -> bool:
-        if not isinstance(self.input, (int,float)):
+        if not isinstance(self.input, (float,int)):
             raise TypeError('Invalid Type Entered, float or integer type Expected')
         elif self.input < 0:
             raise TypeError('Invalid Value Entered, positive value Expected')
@@ -59,7 +59,7 @@ class TimeValidator(Validate):
         super().__init__(input)
 
     def validating(self) -> bool:
-        if not isinstance(self.input, float):
+        if not isinstance(self.input, (float,int)):
             raise TypeError('Invalid Type Entered, float type Expected')
         elif self.input < 0:
             raise TypeError('Invalid Value Entered, positive value Expected')
@@ -76,7 +76,7 @@ class RateValidator(Validate):
         super().__init__(input)
 
     def validating(self) -> bool:
-        if not isinstance(self.input, float):
+        if not isinstance(self.input, (float,int)):
             raise TypeError('Invalid Type Entered, float type Expected')
         elif self.input < 0:
             raise TypeError('Invalid Value Entered, positive value Expected')
